@@ -23,7 +23,7 @@ const importData = async () => {
     const adminUser = await createdUsers[0]._id
 
     const sampleProducts = products.map(product => {
-      return {...product, user: adminUser }
+      return { ...product, user: adminUser }
     })
     await Product.insertMany(sampleProducts)
 
@@ -31,6 +31,7 @@ const importData = async () => {
     process.exit()
   } catch (error) { 
     console.log(`${error}`.red.inverse);
+    process.exit()
   } 
 } 
 
@@ -51,8 +52,11 @@ const destroyData = async () => {
 } 
 
 
-if(process.argv[2] === '-d' ) {
+if (process.argv[2] === '-d') {
   destroyData()
-}else {
+} else {
   importData()
 }
+
+
+

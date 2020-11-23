@@ -3,7 +3,7 @@ import Product from '../models/productModel.js'
 
 
 // @desc Fetch All products 
-// GET /api/proucts
+// GET /api/products 
 // @access Public 
 
 const getProducts = asyncHandler(async(req, res) => {

@@ -1,4 +1,7 @@
 import { 
+  USER_DETAILS_FAIL,
+  USER_DETAILS_REQUEST,
+  USER_DETAILS_SUCCESS,
   USER_LOGIN_FAIL, 
   USER_LOGIN_REQUEST, 
   USER_LOGOUT, 
@@ -54,6 +57,7 @@ export const register = (name, email, password) => async (dispatch) => {
     const configObj = {
       headers: {
         'Content-Type': 'application/json', 
+        Authorization: ``
       }
     } 
     const { data } =  await axios.post(
@@ -75,6 +79,38 @@ export const register = (name, email, password) => async (dispatch) => {
   } catch (error) {
     dispatch({
       type: USER_REGISTER_FAIL,
+      payload: error.response && error.response.message 
+      ? error.response.data.message 
+      : error.message
+    })
+  }
+}
+
+
+export const getUserDetails = (id) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: USER_DETAILS_REQUEST
+    })
+
+    const { userLogin: { userInfo } } = getState()
+
+    const configObj = {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${userInfo.token}`, 
+      },
+    } 
+    const { data } =  await axios.get(`/api/users/${id}`, configObj)
+
+      dispatch({
+        type: USER_DETAILS_SUCCESS, 
+        payload: data  
+      })
+
+  } catch (error) {
+    dispatch({
+      type: USER_DETAILS_FAIL,
       payload: error.response && error.response.message 
       ? error.response.data.message 
       : error.message

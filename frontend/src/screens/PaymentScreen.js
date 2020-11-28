@@ -43,14 +43,14 @@ const PaymentScreen = ({ history }) => {
               </Form.Check>
             </Col>
             <Col>
-              <Form.Check 
+              {/* <Form.Check 
                 type='radio' 
                 label='Stripe' 
                 id='Stripe' 
                 name='paymentMethod' 
                 value='Stripe' 
-                onChange={(e) => setPaymentMethod(e.target.value)}>  
-              </Form.Check>
+                // onChange={(e) => setPaymentMethod(e.target.value)}>  
+              </Form.Check> */}
             </Col>
         </Form.Group>
         <Button type='submit' variant='primary'>

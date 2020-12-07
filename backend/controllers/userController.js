@@ -140,4 +140,48 @@ const deleteUser = asyncHandler(async(req, res) => {
 })
 
 
-export { authUser, getUserProfile, registerUser, updateUserProfile, getUsers, deleteUser }
+// @desc Get user by id   
+// GET /api/users/:id 
+// @access Private/Admin
+
+const getUserById = asyncHandler(async(req, res) => {
+  const user = await User.findById(req.params.id).select('-password')
+
+  if(user) {
+    res.json(user)
+  } else {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
+
+
+// @desc Update user 
+// PUT /api/users/:id
+// @access Private/Admin
+
+const updateUser = asyncHandler(async(req, res) => {
+  const user = await User.findById(req.params.id)
+
+  if(user) {
+    user.name = req.body.name || user.name 
+    user.email = req.body.email || user.email 
+    //covers null and false to false if user.isAdmin 
+    user.isAdmin = req.body.isAdmin === true ? true : false 
+
+    const updatedUser = await user.save() 
+
+    res.json({
+      _id: updatedUser._id, 
+      name: updatedUser.name,
+      email: updatedUser.email, 
+      isAdmin: updatedUser.isAdmin,
+    })
+
+  } else {
+    res.status(404)
+    throw new Error('User not found')
+  }
+})
+
+export { authUser, getUserProfile, registerUser, updateUserProfile, getUsers, deleteUser, getUserById, updateUser }

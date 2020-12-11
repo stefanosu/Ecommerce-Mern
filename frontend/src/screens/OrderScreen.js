@@ -3,13 +3,13 @@ import axios from 'axios'
 import { PayPalButton } from 'react-paypal-button-v2'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { Col, Row, Image, Card, ListGroup } from 'react-bootstrap'
+import { Col, Row, Image, Card, ListGroup, Button } from 'react-bootstrap'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import { getOrderDetails, payOrder } from '../actions/orderActions'
-import { ORDER_PAY_RESET } from '../constants/orderConstants'
+import { ORDER_PAY_RESET, ORDER_DELIVER_RESET } from '../constants/orderConstants'
 
-const OrderScreen = ({ match }) => {
+const OrderScreen = ({ match, history }) => {
   const orderId = match.params.id 
   
   const [sdkReady, setSdkReady ] = useState(false)
@@ -22,6 +22,20 @@ const OrderScreen = ({ match }) => {
 
   const orderPay = useSelector((state) => state.orderPay) 
   const { loading: loadingPay , success: successPay } = orderPay
+
+  const userLogin = useSelector((state) => state.userLogin) 
+  const { userInfo } = userLogin
+
+  const orderDeliver = useSelector((state) => state.orderDeliver) 
+  const { loading: loadingDeliver , success: successDeliver } = orderDeliver
+
+
+  useEffect(() => {
+    if(!userInfo) {
+      history.push('/login')
+    }
+  })
+
 
   useEffect(() => {
     const addPayPalScript = async () => {
@@ -36,8 +50,9 @@ const OrderScreen = ({ match }) => {
         document.body.appendChild(script)
       }
       
-      if(!order || successPay) {
+      if(!order || successPay || successDeliver) {
         dispatch({ type: ORDER_PAY_RESET})
+        dispatch({ type: ORDER_DELIVER_RESET})
         dispatch(getOrderDetails(orderId))
     } else if(!order.isPaid) {
         if(!window.paypal) {
@@ -46,7 +61,7 @@ const OrderScreen = ({ match }) => {
           setSdkReady(true)
         }
     }
-  }, [successPay, orderId, dispatch, order])
+  }, [successPay, orderId, dispatch, order, successDeliver])
 
   if(!loading) { 
     //calculate prices
@@ -62,6 +77,10 @@ const OrderScreen = ({ match }) => {
   const successPaymentHandler = (paymentResult) => {
     console.log(paymentResult)
     dispatch(payOrder(orderId,paymentResult ))
+  }
+
+  const deliverHandler = () => {
+
   }
 
   return loading ? <Loader /> : error ? <Message variant='danger'>{error}
@@ -164,6 +183,17 @@ const OrderScreen = ({ match }) => {
                   {loadingPay && <Loader /> }
                   {!sdkReady ? <Loader /> : (
                   <PayPalButton amount={order.totalPrice} onSuccess={successPaymentHandler}></PayPalButton>
+                  )}
+                    {loadingDeliver && <Loader />}
+                  { userInfo && userInfo.isAdmin && order.isPaid && !order.isDeliverd && (
+                  <ListGroup.Item> 
+                    <Button 
+                      type='button'
+                      className='btn btn-block'
+                      onClick={deliverHandler}>
+                        Mark As Delivered
+                    </Button>
+                  </ListGroup.Item>
                   )}
                 </ListGroup.Item>
               )}

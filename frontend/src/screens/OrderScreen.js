@@ -30,14 +30,13 @@ const OrderScreen = ({ match, history }) => {
   const { loading: loadingDeliver , success: successDeliver } = orderDeliver
 
 
+
+
+
   useEffect(() => {
     if(!userInfo) {
       history.push('/login')
     }
-  })
-
-
-  useEffect(() => {
     const addPayPalScript = async () => {
       const { data: clientId } = await axios.get('/api/config/paypal')
       const script = document.createElement('script')
@@ -185,7 +184,7 @@ const OrderScreen = ({ match, history }) => {
                   <PayPalButton amount={order.totalPrice} onSuccess={successPaymentHandler}></PayPalButton>
                   )}
                     {loadingDeliver && <Loader />}
-                  { userInfo && userInfo.isAdmin && order.isPaid && !order.isDeliverd && (
+                  { userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
                   <ListGroup.Item> 
                     <Button 
                       type='button'
